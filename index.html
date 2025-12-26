@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Nepali Date Converter | NirajanG</title>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description"
+        content="An ultra-modern, liquid glass style bidirectional date converter for Nepali (BS) and English (AD) calendars.">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <script src="nepali.datepicker.v5.0.6.min.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="nepali.datepicker.v5.0.6.min.css" type="text/css" />
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <link href='https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/ui-lightness/jquery-ui.css'
+        rel='stylesheet'>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js">
+    </script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+        :root {
+            --primary-bg: #E0E5F0;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.25);
+            --text-color: #1A2E44;
+            --accent-color: #007AFF;
+            --glow-color: rgba(0, 122, 255, 0.7);
+            --shadow-light: rgba(255, 255, 255, 0.7);
+            --shadow-dark: rgba(163, 177, 198, 0.6);
+            --inset-shadow-light: rgba(255, 255, 255, 0.5);
+            --inset-shadow-dark: rgba(163, 177, 198, 0.5);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background-color: var(--primary-bg);
+            color: var(--text-color);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* 1. Animated Aurora Background */
+        .aurora-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            overflow: hidden;
+        }
+
+        .aurora {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.4;
+        }
+
+        .aurora-1 {
+            width: 60vw;
+            height: 60vw;
+            max-width: 700px;
+            max-height: 700px;
+            background: radial-gradient(circle, rgba(0, 122, 255, 0.5) 0%, rgba(0, 122, 255, 0) 70%);
+            top: -20%;
+            left: -10%;
+            animation: moveAurora1 25s infinite alternate ease-in-out;
+        }
+
+        .aurora-2 {
+            width: 50vw;
+            height: 50vw;
+            max-width: 600px;
+            max-height: 600px;
+            background: radial-gradient(circle, rgba(150, 200, 255, 0.5) 0%, rgba(150, 200, 255, 0) 70%);
+            bottom: -25%;
+            right: -15%;
+            animation: moveAurora2 30s infinite alternate ease-in-out;
+        }
+
+        @keyframes moveAurora1 {
+            to { transform: translate(15vw, 20vh) rotate(15deg) scale(1.2); }
+        }
+        @keyframes moveAurora2 {
+            to { transform: translate(-20vw, -15vh) rotate(-20deg) scale(1.1); }
+        }
+
+        /* 2. Floating SVG Blobs */
+        .svg-blobs {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .svg-blob {
+            position: absolute;
+            opacity: 0.3;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        .svg-blob:nth-child(1) {
+            width: 250px;
+            top: 10%;
+            left: 5%;
+            animation-duration: 22s;
+            animation-delay: -5s;
+        }
+        .svg-blob:nth-child(2) {
+            width: 300px;
+            bottom: 5%;
+            right: 2%;
+            animation-duration: 25s;
+            animation-delay: -10s;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-30px) rotate(180deg) scale(1.1); }
+            100% { transform: translateY(0) rotate(360deg); }
+        }
+
+        /* 3. Particle Animation */
+        #particle-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 50%;
+            animation: particle-animation 25s infinite linear;
+            opacity: 0;
+        }
+
+        @keyframes particle-animation {
+            from {
+                transform: translate(var(--start-x), var(--start-y));
+                opacity: 1;
+            }
+            to {
+                transform: translate(var(--end-x), var(--end-y));
+                opacity: 0;
+            }
+        }
+        
+        .content-area {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            gap: 25px;
+            z-index: 1;
+        }
+
+        .main-title {
+            font-size: 3.5rem;
+            font-weight: 700;
+            text-align: center;
+            letter-spacing: 1.5px;
+            background: linear-gradient(135deg, var(--text-color) 20%, var(--accent-color) 50%, var(--text-color) 80%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0px 2px 4px rgba(255, 255, 255, 0.5);
+            animation: fadeInDown 1s ease-out, shimmer 5s linear infinite;
+        }
+
+        @keyframes shimmer {
+            to { background-position: -200% center; }
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .converter-container {
+            background: var(--glass-bg);
+            border-radius: 40px;
+            border: 1.5px solid var(--glass-border);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.2), 0 1px 3px rgba(0, 0, 0, 0.05);
+            padding: 35px 25px;
+            width: 100%;
+            max-width: 850px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            animation: scaleIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            display: flex;
+            align-items: stretch;
+            overflow: hidden;
+        }
+        
+        .converter-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 40px;
+            background: radial-gradient(
+                circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+                rgba(255, 255, 255, 0.2),
+                rgba(255, 255, 255, 0) 40%
+            );
+            opacity: 0;
+            transition: opacity 0.3s ease-out;
+            pointer-events: none;
+        }
+        .converter-container:hover::before {
+            opacity: 1;
+        }
+
+        .converter-container:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 50px 100px -20px rgba(0, 0, 0, 0.25), 0 2px 5px rgba(0, 0, 0, 0.08);
+        }
+
+        @keyframes scaleIn {
+            from { opacity: 0; transform: scale(0.85); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .date-panel {
+            flex: 1;
+            padding: 0 35px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-width: 0;
+        }
+
+        .separator {
+            width: 2px;
+            background: linear-gradient(to bottom, transparent, var(--accent-color), transparent);
+            align-self: stretch;
+            border-radius: 2px;
+            animation: pulseGlow 2.5s infinite alternate;
+            transition: all 0.3s ease;
+        }
+
+        @keyframes pulseGlow {
+            from { filter: drop-shadow(0 0 3px var(--glow-color)); }
+            to { filter: drop-shadow(0 0 10px var(--glow-color)); }
+        }
+
+        h2 {
+            font-weight: 500;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--text-color);
+            opacity: 0.8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        h2 .icon {
+            width: 20px;
+            height: 20px;
+            opacity: 0.7;
+        }
+
+        .styled-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 25px;
+            padding: 15px 20px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 500;
+            color: var(--accent-color);
+            text-align: center;
+            outline: none;
+            box-shadow: inset 3px 3px 6px var(--inset-shadow-dark), inset -3px -3px 6px var(--inset-shadow-light);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .styled-input:hover {
+            border-color: rgba(0, 122, 255, 0.5);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .styled-input:focus {
+            border-color: var(--accent-color);
+            background: rgba(255, 255, 255, 0.25);
+            box-shadow: inset 2px 2px 4px var(--inset-shadow-dark), inset -2px -2px 4px var(--inset-shadow-light), 0 0 15px 5px var(--glow-color);
+        }
+        
+        .todays-date-container {
+            padding: 12px 25px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            animation: fadeInUp 1s ease-out 0.4s;
+            animation-fill-mode: backwards;
+        }
+
+        .todays-date-container span {
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-color);
+            opacity: 0.9;
+            text-shadow: 1px 1px 2px var(--shadow-light);
+        }
+
+        .todays-date-container .date-separator {
+            margin: 0 15px;
+            opacity: 0.5;
+        }
+
+        .site-footer {
+            flex-shrink: 0;
+            text-align: center;
+            padding: 1.5rem;
+            width: 100%;
+            color: var(--text-color);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            animation: fadeInUp 1s ease-out;
+            z-index: 1;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .description,
+        .copyright-text {
+            font-size: 0.9rem;
+            line-height: 1.6;
+            max-width: 600px;
+            margin: 0 auto;
+            opacity: 0.8;
+        }
+
+        .copyright-text {
+            margin-top: 10px;
+            font-size: 0.8rem;
+            opacity: 0.6;
+        }
+
+        .site-footer a {
+            color: var(--accent-color);
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .site-footer a:hover {
+            color: #0056b3;
+            text-shadow: 0 0 10px var(--glow-color);
+        }
+        
+        .nepali-datepicker, .ui-datepicker {
+            background-color: rgba(240, 245, 255, 0.5) !important;
+            border-radius: 20px !important;
+            border: 1px solid rgba(255, 255, 255, 0.5) !important;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15) !important;
+            padding: 15px !important;
+            backdrop-filter: blur(20px) !important;
+            -webkit-backdrop-filter: blur(20px) !important;
+        }
+
+        @media (max-width: 768px) {
+            .main-title { font-size: 2.5rem; }
+            .converter-container { flex-direction: column; gap: 30px; padding: 30px; margin: 0 15px; }
+            .separator { width: 80%; height: 2px; margin: 0 auto; background: linear-gradient(to right, transparent, var(--accent-color), transparent); }
+            .styled-input { font-size: 2.0rem; }
+        }
+
+        @media (max-width: 480px) {
+            .main-title { font-size: 1.8rem; }
+            .styled-input { font-size: 1.6rem; }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Background Visuals -->
+    <div class="aurora-background">
+        <div class="aurora aurora-1"></div>
+        <div class="aurora aurora-2"></div>
+    </div>
+    <div id="particle-container"></div>
+    <div class="svg-blobs">
+        <svg class="svg-blob" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color: rgba(0, 122, 255, 0.6);" />
+                    <stop offset="100%" style="stop-color: rgba(150, 200, 255, 0.6);" />
+                </linearGradient>
+            </defs>
+            <path fill="url(#gradient1)" d="M441.5,321Q443,400,371.5,437Q300,474,228,451Q156,428,95.5,389Q35,350,56,275Q77,200,103.5,140Q130,80,210.5,50Q291,20,361,56Q431,92,436.5,171Q442,250,441.5,321Z"></path>
+        </svg>
+        <svg class="svg-blob" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <linearGradient id="gradient2" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color: rgba(180, 210, 255, 0.6);" />
+                    <stop offset="100%" style="stop-color: rgba(0, 122, 255, 0.6);" />
+                </linearGradient>
+            </defs>
+            <path fill="url(#gradient2)" d="M429,321Q408,400,344.5,435.5Q281,471,215,445Q149,419,95,379.5Q41,340,59.5,270Q78,200,107,143.5Q136,87,207.5,63Q279,39,353,67Q427,95,438,172.5Q449,250,429,321Z"></path>
+        </svg>
+    </div>
+
+    <main class="content-area">
+        <h1 class="main-title">Nepali Date Converter</h1>
+        <div class="converter-container">
+            <div class="date-panel">
+                <h2>
+                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"></path></svg>
+                    Nepali Date (BS)
+                </h2>
+                <input type="text" id="nepali-datepicker" class="styled-input" readonly>
+            </div>
+            <div class="separator"></div>
+            <div class="date-panel">
+                <h2>
+                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"></path></svg>
+                    English Date (AD)
+                </h2>
+                <input type="text" class="styled-input" id="english_date" readonly>
+            </div>
+        </div>
+
+        <div class="todays-date-container">
+            <span id="nepali-day">Loading...</span>
+            <span class="date-separator">|</span>
+            <span id="english-day">Loading...</span>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <p class="description">
+            A simple, bidirectional tool to convert dates between the English (AD) and Nepali (BS) calendar systems.
+            <br>
+            Powered by <a href="https://nepalidatepicker.sajanmaharjan.com.np/v5/" target="_blank"
+                rel="noopener noreferrer">Nepali Datepicker v5</a> by Sajan Maharjan.
+        </p>
+        <p class="copyright-text">
+            © <span id="currentYear"></span> <a href="https://nirajang.com.np" target="_blank"
+                rel="noopener noreferrer">nirajang.com.np</a> | All Rights Reserved.
+        </p>
+    </footer>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // --- VISUALS SCRIPT ---
+        const container = document.querySelector('.converter-container');
+        container.addEventListener('mousemove', e => {
+            const rect = container.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            container.style.setProperty('--mouse-x', `${x}px`);
+            container.style.setProperty('--mouse-y', `${y}px`);
+        });
+        
+        const particleContainer = document.getElementById('particle-container');
+        const particleCount = 20;
+        for (let i = 0; i < particleCount; i++) {
+            const particle = document.createElement('div');
+            particle.classList.add('particle');
+            const size = Math.random() * 3 + 1;
+            particle.style.width = `${size}px`;
+            particle.style.height = `${size}px`;
+            particle.style.setProperty('--start-x', `${Math.random() * 100}vw`);
+            particle.style.setProperty('--start-y', `${Math.random() * 100}vh`);
+            particle.style.setProperty('--end-x', `${Math.random() * 100}vw`);
+            particle.style.setProperty('--end-y', `${Math.random() * 100}vh`);
+            particle.style.animationDuration = `${Math.random() * 15 + 10}s`;
+            particle.style.animationDelay = `${Math.random() * -25}s`;
+            particleContainer.appendChild(particle);
+        }
+      });
+    </script>
+
+
+        <script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    const nepaliDayNames = ["आइतवार", "सोमवार", "मङ्गलवार", "बुधवार", "बिहिवार", "शुक्रवार", "शनिवार"];
+
+    const today = new Date();
+    const dayIndex = today.getDay(); // 0 (Sunday) to 6 (Saturday)
+
+    document.getElementById("english-day").textContent = dayNames[dayIndex];
+    document.getElementById("nepali-day").textContent = nepaliDayNames[dayIndex];
+  });
+</script>
+
+
+    <script>
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+        // Set Today's Date Display
+        const today = new Date();
+        const options = {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        };
+        // Use 'en-GB' for the "22 August 2025" format regardless of user's locale
+        const formattedDate = new Intl.DateTimeFormat('en-GB', options).format(today);
+
+        </script>
+    <script>
+  // Initialize Nepali Datepicker
+  // today's date
+  var nepali_date = document.getElementById("nepali-datepicker");
+  $("#nepali-datepicker").val(NepaliFunctions.BS.GetCurrentDate('YYYY-MM-DD'));
+  $("#english_date").val(NepaliFunctions.BS2AD($("#nepali-datepicker").val(), "YYYY-MM-DD", "MM/DD/YYYY"));
+
+  // Initialize Datepicker with options
+  nepali_date.NepaliDatePicker({
+    animation: "slide",
+    onSelect: function () {
+      // Convert to English date
+      const nepaliVal = $("#nepali-datepicker").val();
+      const engDate = NepaliFunctions.BS2AD(nepaliVal, "YYYY-MM-DD", "MM/DD/YYYY");
+      $("#english_date").val(engDate);
+
+      // Calculate day of the week
+      const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+      const nepaliDayNames = ["आइतवार", "सोमवार", "मङ्गलवार", "बुधवार", "बिहिवार", "शुक्रवार", "शनिवार"];
+
+      const selectedDate = new Date(engDate);
+      const dayIndex = selectedDate.getDay(); // 0-6
+
+      // Display day names
+      $("#english-day").text(dayNames[dayIndex]);
+      $("#nepali-day").text(nepaliDayNames[dayIndex]);
+    }
+  });
+</script>
+
+
+<script>
+  $(function() {
+    const currentYear = new Date().getFullYear();
+    const startYear = currentYear - 75;
+    const endYear = currentYear + 75;
+
+    $("#english_date").datepicker({
+      dateFormat: "mm/dd/yy",
+      changeMonth: true,
+      changeYear: true,
+      yearRange: `${startYear}:${endYear}`,
+      onSelect: function(dateText, inst) {
+        const eng_date = dateText;
+
+        // Convert selected dateText (MM/DD/YY) to Date object
+        const selectedDate = new Date(dateText);
+        const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+        const nepaliDayNames = ["आइतवार", "सोमवार", "मङ्गलवार", "बुधवार", "बिहिवार", "शुक्रवार", "शनिवार"];
+        const dayIndex = selectedDate.getDay(); // 0 (Sunday) to 6 (Saturday)
+
+        // Display English day
+        $("#english-day").text(dayNames[dayIndex]);
+
+        // Display Nepali day
+        $("#nepali-day").text(nepaliDayNames[dayIndex]);
+
+        // Convert to Nepali date
+        const nepaliDate = NepaliFunctions.AD2BS(eng_date, "MM/DD/YYYY", "YYYY-MM-DD");
+        $("#nepali-datepicker").val(nepaliDate);
+      }
+    });
+  });
+</script>
+
+
+    
+</body>
+</html>
